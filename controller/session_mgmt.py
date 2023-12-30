@@ -18,3 +18,17 @@ class BlogSession():
             'access_time' : now_time
             
         })
+    
+    @staticmethod
+    def get_blog_page(blog_id=None):
+        if blog_id == None:
+            if BlogSession.session_count == 0:
+                BlogSession.session_count = 1
+                return 'blog_A.html'
+            else:
+                BlogSession.session_count = 0
+                return 'blog_B.html'
+        else:
+            return BlogSession.blog_page[blog_id]
+    
+    
