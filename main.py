@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, render_template, make_response
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 from flask_cors import CORS
 from view import blog
+from controller.user_mgmt import User
 import os
 
 # 인증서 비활성, 안정되지 않은 전송허용 https만 지원기능을 http에서 테스트할 경우
