@@ -1,5 +1,6 @@
-from flask import Flask, Blueprint, request, render_template, make_response, jsonify, redirect, url_for
+from flask import Flask, Blueprint, request, render_template, make_response, jsonify, redirect, url_for, session
 from controller.user_mgmt import User
+from controller.session_mgmt import BlogSession
 from flask_login import login_user,current_user,logout_user
 import datetime
 
@@ -18,8 +19,8 @@ def set_email():
         # print('set_email', request.headers)
         # if content type is application/json
         # print('set_email', request.get_json())
-        print('set_email', request.form['user_email'])
-        user = User.create(request.form['user_email'], 'A')
+        # print('set_email', request.form['user_email'])
+        user = User.create(request.form['user_email'], request.form['blog_id'])
         login_user(user, remember=True, duration=datetime.timedelta(days=365))
         
         return redirect(url_for('blog.set_blog'))
@@ -27,12 +28,17 @@ def set_email():
     
 @blog_link.route('/logout')
 def logout():
+    User.delete(current_user.id)
     logout_user()
     return redirect(url_for('blog.set_blog'))
     
 @blog_link.route('/set_blog')
 def set_blog():
     if current_user.is_authenticated:
-        return render_template('blog_A.html', user_email=current_user.user_email)
+        webpage_name = BlogSession.get_blog_page(current_user.blog_id)
+        BlogSession.save_session_info(session['client_id'], current_user.user_email, webpage_name)
+        return render_template(webpage_name, user_email=current_user.user_email)
     else:
-        return render_template('blog_A.html')
+        webpage_name = BlogSession.get_blog_page()
+        BlogSession.save_session_info(session['client_id'], 'anonymous', webpage_name)
+        return render_template(webpage_name)
